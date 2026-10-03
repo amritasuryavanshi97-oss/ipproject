@@ -15,10 +15,37 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        
+        // Existing endpoints
         server.createContext("/api/checkin", Main::handleCheckin);
         server.createContext("/api/status", Main::handleStatus);
+        
+        // NEW: Login endpoint
+        server.createContext("/api/login", Main::handleLogin);
+        
         server.start();
         System.out.println("AICTE Backend running on http://localhost:8080");
+    }
+
+    // NEW: Handle Login Requests
+    private static void handleLogin(HttpExchange ex) throws IOException {
+        addCors(ex);
+        switch (ex.getRequestMethod().toUpperCase()) {
+            case "OPTIONS" -> ex.sendResponseHeaders(204, -1);   // browser CORS preflight
+            case "POST" -> {
+                // Read the incoming username/password JSON
+                String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                System.out.println("Login attempt received: " + body);
+                
+                // TODO: In a real app, parse the JSON, check the database, and verify the password hash.
+                // For this demo, we will pretend the login is always successful.
+                
+                String responseJson = "{\"status\":\"success\", \"message\":\"Authentication successful\", \"token\":\"mock-jwt-token-123\"}";
+                send(ex, 200, responseJson);
+            }
+            default -> ex.sendResponseHeaders(405, -1);
+        }
+        ex.close();
     }
 
     private static void handleCheckin(HttpExchange ex) throws IOException {
