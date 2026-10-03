@@ -1,7 +1,7 @@
 /* ===== CONFIG ===== */
 const API = "http://localhost:8080/api";
 const TARGET_POINTS = 100;
-const EVENT = { lat: 19.0760, lng: 72.8777, radius: 100 };
+const EVENT = { lat: 19.0760, lng: 72.8777, radius: 100 }; // replace with your venue
 
 /* ===== STATE ===== */
 let activities = [
@@ -30,39 +30,7 @@ function switchRole(role) {
   $("facultyView").classList.toggle("hidden", student);
   $("studentBtn").classList.toggle("active", student);
   $("facultyBtn").classList.toggle("active", !student);
-  
   if (student && map) setTimeout(() => map.invalidateSize(), 100);
-}
-
-/* ===== AUTHENTICATION ===== */
-async function handleLogin(event) {
-  event.preventDefault(); 
-  
-  const email = $("email").value;
-  const password = $("password").value;
-  const role = $("role").value;
-
-  try {
-    const response = await fetch(API + "/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, password: password, role: role })
-    });
-
-    const data = await response.json();
-
-    if (data.status === "success") {
-      $("loginView").classList.add("hidden");
-      $("appView").classList.remove("hidden");
-      switchRole(role);
-      toast("Logged in successfully as " + (role === "student" ? "Student" : "Faculty"));
-    } else {
-      toast("Login failed: Invalid credentials");
-    }
-  } catch (error) {
-    console.error("Login error:", error);
-    toast("Error connecting to server.");
-  }
 }
 
 /* ===== PROGRESS / LEDGER / CHART ===== */
