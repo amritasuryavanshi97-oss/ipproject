@@ -30,7 +30,30 @@ function switchRole(role) {
   $("facultyView").classList.toggle("hidden", student);
   $("studentBtn").classList.toggle("active", student);
   $("facultyBtn").classList.toggle("active", !student);
+  
+  // This invalidates map size so it renders correctly after being unhidden
   if (student && map) setTimeout(() => map.invalidateSize(), 100);
+}
+
+/* ===== AUTHENTICATION ===== */
+function handleLogin(event) {
+  // Prevent the form from submitting and refreshing the page
+  event.preventDefault(); 
+  
+  // Get the selected role from the dropdown
+  const role = $("role").value;
+  
+  // Hide the login screen
+  $("loginView").classList.add("hidden");
+  
+  // Show the main application dashboard
+  $("appView").classList.remove("hidden");
+  
+  // Trigger the role switch to show the correct views
+  switchRole(role);
+  
+  // Show a welcome toast
+  toast("Logged in successfully as " + (role === "student" ? "Student" : "Faculty"));
 }
 
 /* ===== PROGRESS / LEDGER / CHART ===== */
