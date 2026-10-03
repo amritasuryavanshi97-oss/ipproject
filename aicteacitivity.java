@@ -8,37 +8,31 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Main {
+public class aicteacitivity {
 
-    // In-memory store for the demo. Replace with a database later.
+    // In-memory store for the demo
     private static final List<String> checkins = new CopyOnWriteArrayList<>();
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         
-        // Existing endpoints
-        server.createContext("/api/checkin", Main::handleCheckin);
-        server.createContext("/api/status", Main::handleStatus);
-        
-        // NEW: Login endpoint
-        server.createContext("/api/login", Main::handleLogin);
+        // Endpoints
+        server.createContext("/api/checkin", aicteacitivity::handleCheckin);
+        server.createContext("/api/status", aicteacitivity::handleStatus);
+        server.createContext("/api/login", aicteacitivity::handleLogin);
         
         server.start();
         System.out.println("AICTE Backend running on http://localhost:8080");
     }
 
-    // NEW: Handle Login Requests
     private static void handleLogin(HttpExchange ex) throws IOException {
         addCors(ex);
-        switch (ex.getRequestMethod().toUpperCase()) {
-            case "OPTIONS" -> ex.sendResponseHeaders(204, -1);   // browser CORS preflight
+        // THE LINE BELOW WAS MISSING IN YOUR SCREENSHOT
+        switch (ex.getRequestMethod().toUpperCase()) { 
+            case "OPTIONS" -> ex.sendResponseHeaders(204, -1);
             case "POST" -> {
-                // Read the incoming username/password JSON
                 String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                 System.out.println("Login attempt received: " + body);
-                
-                // TODO: In a real app, parse the JSON, check the database, and verify the password hash.
-                // For this demo, we will pretend the login is always successful.
                 
                 String responseJson = "{\"status\":\"success\", \"message\":\"Authentication successful\", \"token\":\"mock-jwt-token-123\"}";
                 send(ex, 200, responseJson);
@@ -51,7 +45,7 @@ public class Main {
     private static void handleCheckin(HttpExchange ex) throws IOException {
         addCors(ex);
         switch (ex.getRequestMethod().toUpperCase()) {
-            case "OPTIONS" -> ex.sendResponseHeaders(204, -1);   // browser CORS preflight
+            case "OPTIONS" -> ex.sendResponseHeaders(204, -1);
             case "POST" -> {
                 String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                 checkins.add(body);
@@ -77,7 +71,7 @@ public class Main {
     }
 
     private static void send(HttpExchange ex, int code, String json) throws IOException {
-        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);   // length in bytes, not chars
+        byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
         ex.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
         ex.sendResponseHeaders(code, bytes.length);
         ex.getResponseBody().write(bytes);
