@@ -1,58 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AICTE Activity Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
 <body>
 
-<!-- LOGIN VIEW -->
-<div id="loginView" class="login-wrapper">
-  <div class="login-card">
-    <div class="brand center"><span class="brand-mark">A</span> AICTE Activity Tracker</div>
-    <h2>Sign in to your account</h2>
-    
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="input-group">
-        <label for="email">Email / Username</label>
-        <input type="text" id="email" required placeholder="user@college.edu">
-      </div>
-      
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" required placeholder="••••••••">
-      </div>
-      
-      <div class="input-group">
-        <label for="role">Sign in as</label>
-        <select id="role">
-          <option value="student">Student</option>
-          <option value="faculty">Faculty / Mentor</option>
-        </select>
-      </div>
-      
-      <button type="submit" class="primary-btn full-width">Sign In</button>
-    </form>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">A</span> AICTE Activity Tracker</div>
+  <div class="role-switch" role="tablist">
+    <button id="studentBtn" class="active" onclick="switchRole('student')">Student</button>
+    <button id="facultyBtn" onclick="switchRole('faculty')">Faculty / Mentor</button>
   </div>
-</div>
+</header>
 
-<!-- MAIN DASHBOARD (Hidden initially) -->
-<div id="appView" class="hidden">
-  
-  <!-- YOUR EXISTING HEADER GOES HERE -->
-  <header class="topbar">
-    <!-- ... -->
-  </header>
+<!-- STUDENT -->
+<main id="studentView">
+  <section class="hero">
+    <div>
+      <p class="hero-sub">Welcome back, Aditi</p>
+      <h1>You're <span id="remaining">25</span> points away from your 100-point target.</h1>
+      <p class="hero-note">Check in at events with GPS, QR and a photo to earn points.</p>
+    </div>
+    <div class="progress-ring">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff9933"/><stop offset="100%" stop-color="#fcd34d"/>
+          </linearGradient>
+        </defs>
+        <circle class="progress-bg" cx="90" cy="90" r="70"/>
+        <circle id="progressCircle" class="progress-value" cx="90" cy="90" r="70"/>
+      </svg>
+      <div class="progress-text"><strong id="pointsValue">0</strong><span>of 100</span></div>
+    </div>
+  </section>
 
-  <!-- YOUR EXISTING STUDENT MAIN GOES HERE -->
-  <main id="studentView">
-    <!-- ... -->
-  </main>
+  <section class="cards">
+    <div class="card c-blue"><span class="card-icon">🎯</span><p class="card-label">Points left</p><p class="big-number" id="pointsLeft">25</p></div>
+    <div class="card c-green"><span class="card-icon">✅</span><p class="card-label">Approved activities</p><p class="big-number" id="activityCount">0</p></div>
+    <div class="card c-amber"><span class="card-icon">🚦</span><p class="card-label">Semester status</p><div id="statusBadge" class="status green">On track</div></div>
+  </section>
 
-  <!-- YOUR EXISTING FACULTY MAIN GOES HERE -->
-  <main id="facultyView" class="hidden">
-    <!-- ... -->
-  </main>
+  <div class="grid-2">
+    <section class="panel">
+      <h2>📍 Venue check-in</h2>
+      <p class="muted">Allow location access to confirm you're inside the event venue.</p>
+      <button class="primary-btn" onclick="startLocation()">Start GPS tracking</button>
+      <div id="locationStatus" class="info-box">Location not started.</div>
+      <div id="geoBadge" class="geo-badge hidden"></div>
+      <div id="map"></div>
+    </section>
 
-  <!-- YOUR EXISTING FOOTER & TOAST GO HERE -->
-  <div id="toast" class="toast" role="status"></div>
-  <footer><p>© 2026 AICTE Activity Tracker</p></footer>
+    <div class="stack">
+      <section class="panel">
+        <h2>📱 QR check-in</h2>
+        <p class="muted">Scan the event QR code shown at the venue.</p>
+        <div id="reader"></div>
+        <button class="primary-btn" onclick="startQRScanner()">Start QR scanner</button>
+        <div id="qrResult" class="info-box">QR scanner inactive.</div>
+      </section>
 
-</div>
+      <section class="panel">
+        <h2>📷 Venue photo</h2>
+        <p class="muted">Take a live photo at the venue as proof of attendance.</p>
+        <video id="camera" autoplay playsinline></video>
+        <canvas id="snapshotCanvas"></canvas>
+        <div class="button-group">
+          <button class="primary-btn" onclick="startCamera()">Start camera</button>
+          <button class="secondary-btn" onclick="takeSnapshot()">Take photo</button>
+        </div>
+        <img id="snapshot" alt="">
+        <p id="exifStatus" class="muted"></p>
+      </section>
+    </div>
+  </div>
 
+  <div class="grid-2 wide-left">
+    <section class="panel">
+      <h2>📋 Activity point ledger</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Activity</th><th>Category</th><th>Points</th><th>Status</th></tr></thead>
+          <tbody id="activityTable"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>📊 Points by category</h2>
+      <canvas id="activityChart"></canvas>
+      <button class="primary-btn full" onclick="generatePDF()">Download transcript (PDF)</button>
+    </section>
+  </div>
+</main>
+
+<!-- FACULTY -->
+<main id="facultyView" class="hidden">
+  <section class="hero single">
+    <div>
+      <p class="hero-sub">Faculty / Mentor</p>
+      <h1>Review attendance and approve OD requests.</h1>
+      <p class="hero-note"><span id="pendingCount">2</span> requests waiting for your decision.</p>
+    </div>
+  </section>
+
+  <div class="grid-2 wide-left">
+    <section class="panel">
+      <h2>📋 OD approval queue</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Event</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Aditi Singh</td><td>Innovation Workshop</td><td>02 Oct 2026</td>
+              <td><button class="approve" onclick="decideOD(this,true)">Approve</button><button class="reject" onclick="decideOD(this,false)">Reject</button></td></tr>
+            <tr><td>Rahul Sharma</td><td>NSS Activity</td><td>02 Oct 2026</td>
+              <td><button class="approve" onclick="decideOD(this,true)">Approve</button><button class="reject" onclick="decideOD(this,false)">Reject</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>👥 Event attendees</h2>
+      <ul id="attendeeList">
+        <li><span class="avatar">AS</span>Aditi Singh<em class="pill ok">Checked in</em></li>
+        <li><span class="avatar">RS</span>Rahul Sharma<em class="pill ok">Checked in</em></li>
+        <li><span class="avatar">PP</span>Priya Patel<em class="pill ok">Checked in</em></li>
+        <li><span class="avatar">KS</span>Karan Shah<em class="pill wait">Pending</em></li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<div id="toast" class="toast" role="status"></div>
+<footer><p>© 2026 AICTE Activity Tracker</p></footer>
 <script src="script.js"></script>
 </body>
+</html>
