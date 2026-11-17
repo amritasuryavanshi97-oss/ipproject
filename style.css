@@ -446,7 +446,203 @@ html[data-theme="dark"] .mk-col-avg,
 html[data-theme="dark"] .mk-avg-cell {
   background: #26224a !important;
   color: #c4b5fd !important;
-   .mobile-only,
+}
+.tt-slot.is-editing {
+  outline: 2px solid var(--purple);
+  background: rgba(109, 85, 232, 0.08);
+}
+/* =====================================================================
+   ADAPTIVE RESPONSIVE DESIGN: COMPACT LAPTOPS & SMARTPHONES
+   ===================================================================== */
+.mobile-only,
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* 1. Compact Laptops & Tablets (769px - 1100px) */
+@media (max-width: 1100px) and (min-width: 769px) {
+  .sidebar {
+    width: 210px !important;
+    padding: 16px 12px !important;
+  }
+  .main-area,
+  .content-area {
+    margin-left: 210px !important;
+    width: calc(100% - 210px) !important;
+    padding: 18px !important;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .lower-grid,
+  .grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+  .tt-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* 2. Smartphones & Small Portrait Screens (<= 768px) */
+@media (max-width: 768px) {
+  .mobile-only {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    font-size: 18px;
+  }
+
+  /* Slide-out Drawer Sidebar for All Secondary Tabs + Logout */
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 260px !important;
+    z-index: 1200;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+    overflow-y: auto;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .app-shell,
+  #dashboard-view {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+  }
+
+  .main-area,
+  .content-area {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 12px !important;
+  }
+
+  /* Compact Topbar */
+  .topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px !important;
+  }
+  #page-title {
+    font-size: 17px !important;
+    line-height: 1.2;
+  }
+
+  /* Stack All Multi-Column Layouts Vertically */
+  .stats-grid,
+  .lower-grid,
+  .grid-2,
+  .form-two,
+  .tt-grid,
+  .sy-summary,
+  .act-facts {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .page-intro,
+  .table-tools,
+  .ctrl-row,
+  .approval-row,
+  .lecture-row,
+  .deadline-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px;
+  }
+
+  /* Touch-Friendly Controls & No iOS Zoom */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  .btn,
+  .mini-btn,
+  .seg-btn,
+  .cell,
+  .demo-chip {
+    min-height: 42px;
+    padding: 8px 12px;
+  }
+
+  /* Leaflet Maps & Donut Chart Scaling */
+  .map-panel #map,
+  .location-form #faculty-map {
+    height: 210px !important;
+    min-height: 210px !important;
+  }
+  .donut-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Swipeable Practical Marks Spreadsheet & Attendance Register */
+  .table-scroll,
+  .mk-sheet-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+  .mk-col-name,
+  .mk-name-cell {
+    min-width: 130px !important;
+    max-width: 145px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+  }
+  .mk-input {
+    min-width: 54px;
+    height: 36px;
+    font-size: 14px !important;
+  }
+
+  /* Fixed Bottom Thumb Bar */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--white, #ffffff);
+    border-top: 1px solid var(--line, #e4e5f1);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+  }
+  .mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px 6px;
+    font-size: 11px;
+    border-radius: 10px;
+    flex: 1;
+    margin: 0;
+  }
+  .mobile-bottom-nav .nav-item[hidden] {
+    display: none !important;
+  }
+  .mobile-bottom-nav .nav-item span {
+    font-size: 16px;
+  }
+  html[data-theme="dark"] .mobile-bottom-nav {
+    background: #171928;
+    border-top-color: #2c2f4a;
+  }
+  .mobile-only,
 .mobile-bottom-nav {
   display: none !important;
 }
