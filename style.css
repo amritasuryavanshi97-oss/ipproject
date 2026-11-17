@@ -446,4 +446,17 @@ html[data-theme="dark"] .mk-col-avg,
 html[data-theme="dark"] .mk-avg-cell {
   background: #26224a !important;
   color: #c4b5fd !important;
+   .mobile-only,
+.mobile-bottom-nav {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: inline-flex !important;
+  }
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+}
 }
